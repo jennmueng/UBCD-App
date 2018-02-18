@@ -1,0 +1,24 @@
+# See https://help.github.com/ignore-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/webapp/node_modules
+/nativeapp/node_modules
+/nativeapp/.expo
+
+# testing
+/webapp/coverage
+
+# production
+/webapp/build
+
+# misc
+/webapp/.DS_Store
+/webapp/env.local
+/webapp/.env.development.local
+/webapp/.env.test.local
+/webapp/.env.production.local
+
+/webapp/npm-debug.log*
+/webapp/yarn-debug.log*
+/webapp/yarn-error.log*
