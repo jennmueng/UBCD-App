@@ -1,0 +1,22 @@
+
+[
+        {
+          "featureType": "road.highway",
+          "elementType" : "geometry",
+          "stylers": [
+            { "color": "#A09BBF" }
+          ]
+        },
+        {
+            "featureType": "landscape.natural",
+            "stylers": [
+              { "color": "#FBFAFF" }
+            ]
+        },
+        {
+            "featureType": "water",
+            "stylers": [
+              { "color": "#D3E1F3" }
+            ]
+        }
+]

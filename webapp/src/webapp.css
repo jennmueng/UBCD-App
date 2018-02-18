@@ -1,0 +1,43 @@
+
+.webapp header {
+  width: 100%;
+  height: 45px;
+  font-size: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0 15px;
+  color: #ffffff;
+  position: fixed;
+  top: 0;
+}
+.headerLogo {
+  width: 100px;
+  fill: #ffffff;
+}
+.webapp footer {
+  width: 100%;
+  height: 50px;
+  background-color: white;
+  position: fixed;
+  bottom: 0;
+  z-index: 30;
+  filter: drop-shadow( 0px 2px 12px rgba(0,0,0,0.08));
+}
+.webappContentBox {
+  z-index: 5;
+}
+.webappBackground {
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+  height: 100%;  
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  overflow: hidden;
+}
+.webappBackground img {
+  height: 100%;
+}

@@ -1,0 +1,112 @@
+.dash_placeExplorer {
+    position: fixed;
+    bottom: 50px;
+    height: 50vh;
+    width: calc(100vw - 36px);
+    background-color: white;
+    z-index: 2;
+    left: 50%;
+    filter: drop-shadow( 0px 2px 12px rgba(0,0,0,0.1));
+    transform: translateX(-50%);
+    border-radius: 6px 6px 0 0;
+    transition: all .2s;
+    will-change: height, width;
+}
+.plExpanded {
+    height: calc(100vh - 100px) !important;
+    width: 100%;
+}
+.dash_map {
+    width: 100%;
+    height: calc(50vh - 118px);
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    background-color: #ffffff;
+    width: calc(100vw - 36px);
+    filter: drop-shadow( 0px 2px 12px rgba(0,0,0,0.1));
+    transform: translateX(-50%);
+    border-radius: 6px;
+    transition: all .2s;
+    will-change: height, width, border-radius;
+    overflow: hidden;
+    border: 2px solid #ffffff;
+}
+.mapExpanded {
+    width: 100%;
+    height: calc(100vh - 100px) !important;
+    border-radius:  6px 6px 0 0 !important;
+    z-index: 20;
+    border: 0 !important;
+}
+.dash_header {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+.dash_headerIcon {
+    margin: 0 15px;
+    font-size: 20px;
+    color: #606060;
+}
+.dash_search {
+    background-color: #f5f5f5;
+    border: none;
+    text-decoration: none;
+    height: 30px;
+    width: 100%;
+    border-radius: 6px;
+}
+.dash_navBar {
+    position: absolute;
+    top: 50px;
+    height: 45px;
+    padding-bottom: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: 1px solid #E4E4E4;
+
+}
+.dash_navList {
+    padding: 0;
+    height: 40px;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    text-decoration: none;
+}
+.dash_navList a {
+    display: inline-block;
+    text-decoration: none;
+    color: #383838;
+    padding: none;
+    margin: none;
+    color: 383838;
+    font-weight: 500;
+}
+.dash_contentBox {
+    position: absolute;
+    top: 95px;
+    height: calc(100% - 95px);
+    width: 100%;
+    overflow-y: scroll;
+}
+.dash_place {
+    width: 100%;
+    height: 120px;
+    border-bottom: 1px solid #E4E4E4;
+    
+}
+.dash_placeImage {
+    width: 40%;
+    height: 100%;
+    background-color: #B7B7B7;
+}
