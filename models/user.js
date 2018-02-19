@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 let date = require('date-and-time');
+
+const accountSid = 'AC474a0efd5c0db412f69959e6cbd899ec';
+const authToken = '2dc2629b911877b56ab4d1684ad56465';
+
+//Require twilio 
+const twil = require('twilio')(accountSid, authToken);
+
 var userSchema = new mongoose.Schema({
 	email: {
 		type: String,
@@ -12,17 +19,12 @@ var userSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	firstName: {
-		type: String,
-		trim: true
-	},
-	lastName: {
-		type: String,
-		trim: true
-	},
+	name : [{
+		first : String,
+		last : String,
+	}],
 	photo: {
 		type: String,
-		required: true
 	},
 	userType : {
 		type: String,
@@ -36,8 +38,8 @@ var userSchema = new mongoose.Schema({
 		type: Boolean,
 		required: true
 	},
-	prevOTP: {
-		otp : String,
+	otp: {
+		value : String,
 		creationDate : Date
 	},
 	validTokens : [{tokenID : String, lastUsed : Date}],
@@ -127,6 +129,34 @@ userSchema.statics.findByEmail = function(email, callback) {
 		} else {
 			emp.password = null;
 			return callback(null, emp);
+		}
+	});
+};
+
+userSchema.statics.verifyOtp = function(email, otp, callback) {
+	user.findOne({email : email})
+		.exec(function(err, usr) {
+			if (err) {
+			return callback(err);
+		} else if (!usr) {
+			var err = new Error(`No user with the email ${email} was found`);
+			err.status = 401;
+			return callback(err);
+		} else {
+			if (usr.otp.value === otp) {
+				//Check if expired
+				usr.activated = true;
+				usr.save(function(err) {
+					if (err) {
+						return callback(err);
+					} else {
+						return callback(null, true);
+					}
+				});
+			} else {
+				return callback(null, false);
+			}
+			
 		}
 	});
 };
@@ -283,6 +313,28 @@ userSchema.statics.logout = function(username, callback) {
 		});
 };
 
+userSchema.pre('save', function(next) {
+	if (this.isNew) {
+		let otp = Math.floor(1000 + Math.random() * 9000);
+		twil.messages
+		.create({
+			to: this.phone,
+			from: '+17866291967',
+			body: `The OTP to activate your UBCD account is ${otp}`,
+		})
+		.then(message => {
+			console.log(message.sid)
+			this.otp = {
+				value : otp,
+				creationDate : new Date()
+			}
+			return next();
+		});
+	} else {
+		next();
+	}
+	
+  });
 
 //password reset
 var user = mongoose.model('user', userSchema);

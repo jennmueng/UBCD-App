@@ -11,32 +11,24 @@ mongoose.connect('mongodb://0.0.0.0:27017/ubcd');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error: '));
 
-// Twilio Credentials
-const accountSid = 'AC474a0efd5c0db412f69959e6cbd899ec';
-const authToken = '2dc2629b911877b56ab4d1684ad56465';
-
-// require the Twilio module and create a REST client
-const twil = require('twilio')(accountSid, authToken);
-
 const app = exp();
 
 //bodyparser to parse the incoming data.
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 
-app.post('/api/cred/register', function(req, res) {
+app.post('/api/cred/new-user', function(req, res) {
     //Register Account
     let regData = {
         email : req.body.email,
         password : req.body.password,
-        firstName : req.body.firstName,
-        lastName : req.body.lastName,
+        name : req.body.name,
         phone : req.body.phone,
         userType : req.body.userType,
-        activation : false
+        activated : false
     }
 
-    user.create(employeeData, function(err, user) {
+    user.create(regData, function(err, user) {
         if (err) {
             res.send(err);
         } else {
@@ -56,11 +48,16 @@ app.get('/api/cred/otp_request', function(req, res) {
     })
 });
 
-app.post('/api/cred/otp_verify', function(req, res) {
-    //recieve otp
-    //compare to otp in user db, check timeout
-    //if verified, save that user is authenticated
-    //return true or false
+app.post('/api/cred/otp-verify', function(req, res) {
+    user.verifyOtp(req.body.email, req.body.otp, function(err, result) {
+        if (result) {
+            res.send(result);
+            console.log('otp success');
+        } else {
+            res.send(result);
+            console.log('otp failed');
+        }
+    });
 });
 
 app.post('/api/cred/login', function(req, res) {
