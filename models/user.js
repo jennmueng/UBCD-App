@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-let date = require('date-and-time');
-
+const uid = require('uid-safe');
 const accountSid = 'AC474a0efd5c0db412f69959e6cbd899ec';
 const authToken = '2dc2629b911877b56ab4d1684ad56465';
 
@@ -19,10 +18,10 @@ var userSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	name : [{
+	name : {
 		first : String,
 		last : String,
-	}],
+	},
 	photo: {
 		type: String,
 	},
@@ -46,6 +45,7 @@ var userSchema = new mongoose.Schema({
 	lastLoginDate : {
 		type: Date
 	},
+	sessions : [{ sessionID : String, sessionDate : Date}],
 	prefs : {
 		type: Object
 	},
@@ -58,24 +58,33 @@ var userSchema = new mongoose.Schema({
 //authenticate against database
 userSchema.statics.authenticate = function(email, password, callback) {
 	user.findOne({email : email})
-		.exec(function(err, emp) {
+		.exec(function(err, usr) {
 		if (err) {
 			return callback(err);
-		} else if (!emp) {
-			var err = new Error(`No user called ${email} was found`);
+		} else if (!usr) {
+			var err = new Error(`No user with the email ${email} was found`);
 			err.status = 401;
 			return callback(err);
 		}
-		bcrypt.compare(password, emp.password, function(err, result) {
-			console.log(emp.lastLoginDate);
-			if (result === true) {
-				if (!emp.lastLoginDate) {
-					return callback(err, result, true);
-				} else {
-					return callback(null, email);
-				}
+		bcrypt.compare(password, usr.password, function(err, result) {
+			if (result) {
+				//TODO add middleware to delete old sessions and tokens
+				uid(16, (err, sessionID) => {
+					uid(16, (err, tokenID) => {
+						usr.sessions.push({
+							sessionID : sessionID,
+							sessionDate : new Date()
+						});
+						usr.validTokens.push({
+							tokenID : tokenID,
+							lastUsed : new Date()
+						});
+						return callback(null, true, tokenID, sessionID);
+					})
+				})
+				
 			} else {
-				return callback(err, result);	
+				return callback(null, false);	
 			}
 		});
 	});
@@ -95,12 +104,15 @@ userSchema.statics.getOTP = function(email, callback) {
 				.create({
 					to: usr.phone,
 					from: '+17866291967',
-					body: `Your OTP for the UBCD App is ${otp}. เลข OTP สำหรับแอพ UBCD ของคุณคือ ${otp}`,
+					body: `The OTP to activate your UBCD account is ${otp}`,
 				})
 				.then(message => {
 					console.log(message.sid);
-					usr.prevOTP = otp;
-					user.save(function(err) {
+					usr.otp = {
+						value : otp,
+						creationDate : new Date()
+					};
+					usr.save(function(err) {
 						if (err) {
 							return callback(err);
 						} else {
@@ -143,8 +155,10 @@ userSchema.statics.verifyOtp = function(email, otp, callback) {
 			err.status = 401;
 			return callback(err);
 		} else {
-			if (usr.otp.value === otp) {
-				//Check if expired
+			//check if expired and matches
+			let now = new Date();
+			let diff = Math.abs(now - usr.otp.creationDate);
+			if (usr.otp.value === otp && diff < 300000) {
 				usr.activated = true;
 				usr.save(function(err) {
 					if (err) {

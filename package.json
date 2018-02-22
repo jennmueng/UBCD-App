@@ -17,6 +17,7 @@
     "date-and-time": "^0.6.2",
     "express": "^4.16.2",
     "mongoose": "^5.0.6",
-    "twilio": "^3.11.3"
+    "twilio": "^3.11.3",
+    "uid-safe": "^2.1.5"
   }
 }

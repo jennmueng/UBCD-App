@@ -5,6 +5,8 @@
 /webapp/node_modules
 /nativeapp/node_modules
 /nativeapp/.expo
+/nativeapp/android
+/nativeapp/ios
 
 # testing
 /webapp/coverage
