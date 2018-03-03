@@ -11,6 +11,9 @@ var placeSchema = new mongoose.Schema({
         type : String,
         required : true
     },
+    description : String,
+    subcategory : String,
+    category : String,
     phone : String,
     website : String,
     address : String,
@@ -41,8 +44,24 @@ var photoSchema = new mongoose.Schema({
     place : { type : Schema.Types.ObjectId, ref : 'place'},
     likes : Number,
     creationDate : Date,
-    src : String,    
+    srcLarge : String, 
+    srcThumb : String   
 })
+
+placeSchema.index({name : 'text', description : 'text', subcategory : 'text', category : 'text'});
+
+placeSchema.statics.textSearch = (stringInput, scrollAmount, currentLoc, callback) => {
+    place.find({$text: {$search : stringInput}} //within radius of location using Lat & Long.)
+        .skip(scrollAmount * 15)
+        .limit(15)
+        .exec((err, results) => {
+            //Send the data to frontend.
+        });
+}
+
+placeSchema.pre('save', (next) => {
+    this.rating = this.totalRateValue / this.totalRateCount;
+});
 
 var photo = mongoose.model('photo', photoSchema);
 var place = mongoose.model('place', placeSchema);

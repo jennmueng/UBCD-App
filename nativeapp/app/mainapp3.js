@@ -18,25 +18,33 @@ import {
 
 //Components
 import Dashboard from './dashboard/dashboard.js';
-import Map from './map/map.js';
-import Notifications from './notifications/notifications.js';
-import Numbers from './numbers/numbers.js';
 
-const store = createStore(reducers);
+const { height, width } = Dimensions.get('window');
+
+const screenDimensions = {height : height, width : width};
+
+export const isIphoneX = () => {
+    return (
+      Platform.OS === 'ios' &&
+      (height === 812 || width === 812)
+    );
+}
+
 
 const Navigator = TabNavigator(
   {
     Home: {
-      screen: Dashboard,
+      screen: props => <Dashboard expandPE={props.navigation.dispatch.expandPE} shrinkPE={props.shrinkPE} isIphoneX={props.isIphoneX}
+      screenDimensions={props.screenDimensions} {...props}/>,
     },
     Map : {
       screen: Map
     },
-    Notifications : {
-      screen: Notifications
+    Police : {
+      screen: 'Police'
     },
-    Numbers : {
-      screen: Numbers
+    Notifications : {
+      screen: 'Noti'
     }
   },
   {
@@ -48,10 +56,10 @@ const Navigator = TabNavigator(
           iconName = `list`;
         } else if (routeName === 'Map') {
           iconName = `map-pin`;
+        } else if (routeName === 'Police') {
+          iconName = `alert-circle`;
         } else if (routeName === 'Notifications') {
           iconName = `bell`;
-        } else if (routeName === 'Numbers') {
-          iconName = `phone`;
         }
         
         return <Icon name={iconName} size={24} color={focused ? appColors.mainText : appColors.mediumGray}/>;
@@ -69,9 +77,9 @@ const Navigator = TabNavigator(
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-around',
-        paddingTop: store.getState().isIphoneX ? 20 : 0,
-        width:  store.getState().screenDimensions.width - 16,
-        height:  store.getState().isIphoneX ? 30 : 50,
+        paddingTop: isIphoneX() ? 20 : 0,
+        width:  screenDimensions.width - 16,
+        height:  isIphoneX() ? 30 : 50,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.12,
@@ -79,8 +87,8 @@ const Navigator = TabNavigator(
         zIndex: 10,
         borderTopLeftRadius: 4,
         borderTopRightRadius: 4,
-        borderBottomRightRadius:  store.getState().isIphoneX ? 34 : 4,
-        borderBottomLeftRadius:  store.getState().isIphoneX ? 34 : 4,
+        borderBottomRightRadius:  isIphoneX() ? 34 : 4,
+        borderBottomLeftRadius:  isIphoneX() ? 34 : 4,
         borderTopWidth: 0
     }
     }
@@ -90,10 +98,26 @@ const Navigator = TabNavigator(
   }
 );
 
+const middleware = createReactNavigationReduxMiddleware(
+  "root",
+  state => state.nav,
+);
+const addListener = createReduxBoundAddListener("root");
+
+const initialState = Navigator.router.getStateForAction(Navigator.router.getActionForPathAndParams('Home'));
+
+const navReducer = (state = initialState, action) => {
+  const nextState = Navigator.router.getStateForAction(action, state);
+
+  // Simply return the original `state` if `nextState` is null or undefined.
+  return nextState || state;
+};
+
 const mapStateToProps = (state, ownProps) => {
   return {
     isIphoneX : state.isIphoneX,
     screenDimensions : state.screenDimensions,
+    nav: state.nav
   }
 }
  
@@ -107,15 +131,32 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     }
   }
 }
+class TestApp extends React.Component {
+  static propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    nav: PropTypes.object.isRequired,
+  };
+  render() {
+    return (
+      <Navigator navigation={addNavigationHelpers({
+        dispatch: this.props.dispatch,
+        state: this.props.nav,
+        addListener,
+      })} />
+    );
+  }
+}
+
+const appReducer = combineReducers({
+  nav: navReducer,
+  other : reducers
+});
 
 const LinkedMainApp = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)((props) => <Navigator screenProps={{
-    screenDimensions : store.getState().screenDimensions
-}} />);
+  mapStateToProps
+)(TestApp);
 
-
+const store = createStore(appReducer, applyMiddleware(middleware));
 
 const MainAppExport  = () => {
   return(
