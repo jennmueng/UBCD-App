@@ -126,7 +126,7 @@ const mapStateToProps = (state, ownProps) => {
     return {
       isIphoneX : state.isIphoneX,
       screenDimensions : state.screenDimensions,
-      notifications : state.notifications
+      notifications : state.notifications.notifications
     }
   }
    

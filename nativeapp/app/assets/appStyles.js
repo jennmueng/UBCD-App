@@ -4,6 +4,7 @@ export const appColors = {
     secondaryText : '#959799',
     darkGray : '#606060',
     mediumGray : '#B7B7B7',
+    lmGray : '#DCDCDC',
     lightGray : '#F5F5F5',
     white : '#ffffff',
     blueHighlight : '#4C76ED',
@@ -12,7 +13,7 @@ export const appColors = {
 
 export const appFontSizes = {
     title : 18,
-    description : 10,
+    description : 12,
     menu : 14
 
 }

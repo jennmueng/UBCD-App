@@ -1,162 +1,35 @@
 import React from 'react';
-import { StatusBar, StyleSheet, Text, TextInput, View, Image, Button, Animated, Easing } from 'react-native';
+import { StatusBar, StyleSheet, Text, TextInput, View, Image, Button, Animated, Easing, TouchableOpacity, TouchableHighlight } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { TabNavigator } from 'react-navigation';
 
 import Map from '../map/map.js';
 import Header from '../header/header.js';
 import Promotions from './promotions.js';
+import PlaceExplorer from './placeExplorer.js';
+import TabBar from './tabBar.js'
 
 import { appColors, appFontSizes } from '../assets/appStyles.js'
-import { expandPE, shrinkPE } from '../redux/actions';
+import { expandPE, shrinkPE, fetchPlaces } from '../redux/actions';
 import { connect } from 'react-redux';
-
-class TabBar extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      left : new Animated.Value(0)
-    }
-  }
-  componentDidUpdate() {
-    let value = () => {
-      switch(this.props.navigation.state.index) {
-        case 0:
-          return 0;
-        case 1:
-          return 75;
-        case 2:
-          return 177;
-        case 3:
-          return 287;
-        default: 
-          return 0;
-    }};              
-    Animated.timing(                  
-      this.state.left,            
-      {
-        toValue: value(),
-        duration: 120,        
-      }
-    ).start();
-  }
-  render () {
-    let styles = {
-      tabBar : {
-        width: '100%',
-        height : 45,
-        alignItems : 'center',
-        justifyContent : 'space-around',
-        flexDirection : 'row',
-        borderBottomWidth : 1,
-        borderBottomColor : appColors.lightGray
-      },
-      tab : {
-        height : 40,
-        alignItems: 'center',
-        justifyContent: 'center',
-        
-      },
-      tabText : {
-        fontSize : 16,
-        fontWeight : '500',
-        color : appColors.darkGray,
-        paddingBottom: 5
-      },
-      selectedBar : {
-        position: 'absolute',
-        bottom: -1,
-        width: 80,
-        backgroundColor: appColors.blueHighlight
-      }
-    }
-    let Test = this.props.navigation.state.routes.map((nav, index) => (
-      <View key={nav.key} style={styles.tab} >
-        <Text style={styles.tabText} onPress={() => this.props.navigation.navigate(nav.key)}>{nav.routeName}</Text>
-        
-      </View>
-      
-    ));
-    return (
-      <View style={styles.tabBar}>
-        {Test}
-        <Animated.View style={{...styles.selectedBar, height : 5, left : this.state.left }}></Animated.View>
-      </View>
-    )
-  }
-}
-
-
-const Scrollable = new TabNavigator({
-  Hot : {
-    screen : Header
-  },
-  Food : {
-    screen : Header
-  },
-  Attractions : {
-    screen : Header
-  },
-  Hotels : {
-    screen : Header
-  }
-},
-  {
-    tabBarOptions : {
-      style : {
-        backgroundColor: 'none',
-        borderTopWidth: 0,
-        borderBottomWidth: 1,
-        height: 40,
-        padding: 0,
-        margin: 0,
-        alignContent: 'center',
-        justifyContent: 'space-between',
-        flexDirection: 'row'
-      },
-      tabStyle : {
-        height: 40,
-        alignContent: 'center',
-        borderWidth: 1,
-        flex: 1,
-        alignSelf: 'flex-start',
-        padding: 0,
-        margin: 0,
-      }
-    },
-    tabBarComponent: props => (
-      <TabBar {...props} />
-      ),
-    tabBarPosition: 'top',
-    initialRouteName: 'Hot',
-  })
 
 class Dashboard extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       text : '',
       height : new Animated.Value(this.props.screenDimensions.height*.6),
       peZIndex : new Animated.Value(3),
-      toggleIconRotate : new Animated.Value(0)
+      toggleIconRotate : new Animated.Value(0),
+      peExpand : false
     }
+    this.props.dispatch(fetchPlaces('Hot', 0))
   }
-  getTest = () => {
-    console.log('hey');
-    fetch('http://192.168.1.15:8850/api/getTest')
-    .then((response) => {
-      return response.text();
-    })
-    .then((text) => {
-      this.setState({
-        text : text
-      })
-    })
+  componentDidMount() {
   }
   componentDidUpdate() {
-    if(this.props.peExpand) {
+   
+    if(this.state.peExpand) {
       this.state.peZIndex.setValue(4);
       Animated.parallel([
         Animated.spring(                  
@@ -202,8 +75,14 @@ class Dashboard extends React.Component {
     
   }
   togglePE = () => {
-    this.props.peExpand ? this.props.shrinkPE() : this.props.expandPE();
-    this.searchBar.blur();
+    this.setState(prevState => ({
+      peExpand : !prevState.peExpand
+    }),() => {
+      if (!this.state.peExpand) {
+        this.searchBar.blur();
+      }
+    });
+    
   }
   render() {
     
@@ -225,6 +104,9 @@ class Dashboard extends React.Component {
         borderTopLeftRadius: 12,
         borderTopRightRadius: 12,
         zIndex: 3,
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
       },
       shadowBox : {
         shadowColor: '#000',
@@ -250,22 +132,30 @@ class Dashboard extends React.Component {
         alignItems : 'center',
         flexDirection : 'row',
         height: 50,
-        position: 'relative',
+
         width: '100%',
-        top: 0
+
       },
       dash_searchBar : {
         width: '80%',
         height: 40,
         backgroundColor: appColors.lightGray,
         borderRadius: 4,
-        paddingLeft : 8
+        paddingLeft : 8,
+        fontSize: 16
       },
       searchPlaceholder : {
         position: 'absolute',
         left: 55,
         top: 15,
         zIndex: 4
+      },
+      peArea :{
+        width: 400,
+        height: 400,
+        bottom: 0,
+        backgroundColor: 'red',
+        zIndex: 20
       },
       bg_top : {
         width: '100%',
@@ -295,12 +185,13 @@ class Dashboard extends React.Component {
             <View style={styles.dash_header}>
               <View style={styles.dash_headerTop}>
                 <Animated.View style={{transform : ([{ rotate : toggleIconRotate }])}}> 
-                  <Icon
-                    name='chevron-up'
-                    size={24}
-                    color={appColors.darkGray}
-                    onPress={() => {this.togglePE()}}
-                  />
+                <TouchableOpacity onPress={() => this.togglePE()}>
+                    <Icon
+                      name='chevron-up'
+                      size={24}
+                      color={appColors.darkGray}
+                    />
+                </TouchableOpacity>
                 </Animated.View>
                 {!this.state.searchQuery ? 
                 <Icon 
@@ -312,7 +203,7 @@ class Dashboard extends React.Component {
                 <TextInput 
                   style={styles.dash_searchBar}
                   ref={sb => this.searchBar = sb}
-                  onFocus={() => {this.props.expandPE('SEARCH')}}
+                  onFocus={() => this.togglePE()}
                   onChangeText={(searchQuery) => this.setState({searchQuery})}
                   placeholder='      Search'
                   editable = {true}
@@ -322,8 +213,10 @@ class Dashboard extends React.Component {
                 <Icon name='menu' size={24} color={appColors.darkGray}/>
               </View>
             </View>
-            <Scrollable />
-          </Animated.View>
+              <TabBar fetchPlaces={(filter, scrollLevel) => this.props.dispatch(fetchPlaces(filter, scrollLevel))}/>
+              <PlaceExplorer data={this.props.placeExplorer.data}/>
+            </Animated.View>
+                  
         </Animated.View>
         <Image
           style={styles.bg_top}
@@ -337,22 +230,16 @@ class Dashboard extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    isIphoneX : state.isIphoneX,
-    screenDimensions : state.screenDimensions,
-    peExpand : state.peExpand,
-    peExpandType : state.peExpandType
+    screenDimensions : state.dimensions.screenDimensions,
+    placeExplorer : state.placeExplorer,
+    peExpand : state.placeExplorer.peExpand
   }
 }
  
 const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    expandPE : (type) => {
-      dispatch(expandPE(type))
-    },
-    shrinkPE : () => {
-      dispatch(shrinkPE())
+  return { dispatch
     }
-  }
+  
 }
 
 const DashboardLinked= connect(

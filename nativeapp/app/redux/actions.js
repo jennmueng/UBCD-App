@@ -24,6 +24,11 @@ export const PLACE_EXPLORER = {
         SEARCH : 'PE_EXPAND_SEARCH'
     },
     SHRINK : 'PE_SHRINK',
+    GET : 'PE_GET',
+    RECIEVE : {
+        OVERWRITE : 'PE_RECIEVE_OVERWRITE',
+        ADD : 'PE_RECIEVE_ADD'
+    }
 }
 
 export const TOGGLE_SEARCHQUERIES = {
@@ -135,6 +140,7 @@ export const toggleSearchQuery = (type, searchQuery) => {
 
 //Expand mode, define what type of expand.
 export const expandPE = (type) => {
+    console.log('expand')
     return {
         type : (type === 'SEARCH') ? PLACE_EXPLORER.EXPAND.SEARCH : PLACE_EXPLORER.EXPAND.NORMAL,
     }
@@ -145,6 +151,39 @@ export const shrinkPE = () => {
         type : PLACE_EXPLORER.SHRINK
     }
 }
+
+export const getPlaces = (filter, scrollLevel) => {
+    return {
+        type: PLACE_EXPLORER.GET,
+        filter: filter,
+        scrollLevel: scrollLevel
+    }
+}
+
+export const recievePlacesOverWrite = (data) => {
+    return {
+        type : PLACE_EXPLORER.RECIEVE.OVERWRITE,
+        data : data
+    }
+}
+
+export const fetchPlaces = (filter, scrollLevel) => {
+    return dispatch => {
+        dispatch(getPlaces(filter));
+        return axios.get('http://localhost:8850/api/pe-content', filter, scrollLevel)
+        .then((res) => {
+            dispatch(recievePlacesOverWrite(res.data));
+        })
+        .catch((err) => {
+            console.log(err)
+            dispatch(recievePlaces(null))
+        })
+    }
+    
+}
+
+
+
 
 export const getNoti = () => {
     let testArray = [

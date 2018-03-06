@@ -104,7 +104,6 @@ class Map extends React.Component {
                 style={styles.map_searchBarEdit} 
                 name={this.state.searchFocused ? 'x' : 'edit'} 
                 size={20} color={appColors.mediumGray} 
-                filled={true} 
                 onPress={this.state.searchFocused ? (() => this.searchBar.blur()) : this.openPlaceCreator} 
             />
             {!this.state.searchQuery ? 
@@ -243,10 +242,10 @@ class SearchQueries extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    isIphoneX : state.isIphoneX,
-    screenDimensions : state.screenDimensions,
-    searchResults : state.searchResults,
-    pcOpen : state.pcOpen
+    isIphoneX : state.dimensions.isIphoneX,
+    screenDimensions : state.dimensions.screenDimensions,
+    searchResults : state.search.searchResults,
+    pcOpen : state.placeCreator.pcOpen
   }
 }
  

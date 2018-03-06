@@ -2,6 +2,8 @@ const exp = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
+const fs = require('fs');
+const DataURI = require('datauri').promise;
 
 //import Schemas
 const user = require('./models/user.js');
@@ -90,6 +92,50 @@ app.post('/api/cred/check-session', function(req, res) {
 
 app.get('/api/getTest', function(req, res) {
     res.send(`yay you're connected`);
+})
+
+app.get('/api/pe-content', (req, res) => {
+    let placeholderPlaces = [
+        {
+            _id: 123,
+            coordinates : {
+                lat : 15.240092,
+                long : 104.853332
+            },
+            name : `Steve's Bakery`,
+            description : `The best bakery in Ubon`,
+            subcategory : `Cafe`,
+            category : 'Food',
+            phone : `0863937528`,
+            website : null,
+            address : '23 Soi Luang, Tambon Nai Mueang, Amphoe Mueang Ubon Ratchathani, Chang Wat Ubon Ratchathani 34000',
+            totalRateCount : 90,
+            totalRateValue : 11,
+            rating : 9.25,
+            expenseLevel : 3,
+            reviews : [],
+            photos : [
+                {
+                    author : null,
+                    place : 123,
+                    likes : 10,
+                    creationDate : new Date(),
+                    srcLarge : './clientAssets/images/places/stevesbakery.jpg',
+                    srcThumb : './clientAssets/images/places/stevesbakery.jpg',
+                }
+            ],
+            likes : 26,
+            creationDate : new Date(),
+            owner : null,
+            verified : true
+        }
+    ]
+    DataURI(placeholderPlaces[0].photos[0].srcThumb)
+        .then(content => {
+            placeholderPlaces[0].photos[0].srcThumb = content;
+            res.send(placeholderPlaces);
+        })
+        .catch(err => { throw err; });
 })
 
 app.listen('8850');

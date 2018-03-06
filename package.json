@@ -14,8 +14,10 @@
     "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "concurrently": "^3.5.1",
+    "datauri": "^1.1.0",
     "date-and-time": "^0.6.2",
     "express": "^4.16.2",
+    "geolib": "^2.0.24",
     "mongoose": "^5.0.6",
     "twilio": "^3.11.3",
     "uid-safe": "^2.1.5"

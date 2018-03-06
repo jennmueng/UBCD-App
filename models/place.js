@@ -14,6 +14,7 @@ var placeSchema = new mongoose.Schema({
     description : String,
     subcategory : String,
     category : String,
+    expenseLevel: Number,
     phone : String,
     website : String,
     address : String,
