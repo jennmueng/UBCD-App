@@ -2,8 +2,9 @@ import axios from 'axios';
 import {Dimensions, Platform} from 'react-native';
 import { combineReducers } from 'redux';
 
-import { AUTH, PLACE_EXPLORER, TOGGLE_SEARCHQUERIES, NOTI, getAuth, verifyAuth, getNoti, PLACE_CREATOR } from './actions';
+import { AUTH, PLACE_EXPLORER, TOGGLE_SEARCHQUERIES, PLACE, NOTI, getAuth, verifyAuth, getNoti, PLACE_CREATOR } from './actions';
 import { appColors } from '../assets/appStyles';
+import { tempPlace } from '../assets/tempObjects';
 const { height, width } = Dimensions.get('window');
 
 export const isIphoneX = () => {
@@ -60,6 +61,30 @@ const placeExplorer = (state = {
             return Object.assign({}, state, {gettingPeContent : false, data : action.data});
         case PLACE_EXPLORER.RECIEVE.ADD:
             return Object.assign({}, state, {gettingPeContent : false, data : [...state.data, ...action.data]});
+        default:
+            return state;
+    }
+}
+
+const place = (state = {getting: false, expand: false, data : tempPlace}, action) => {
+    switch(action.type) {
+        case PLACE.GET:
+            return Object.assign({}, state, {getting : true, expand: true});
+        case PLACE.RECIEVE:
+            return Object.assign({}, state, {getting : false, data : action.data});
+        case PLACE.CLOSE:
+            return Object.assign({}, state, {getting : false, expand: false});
+        default:
+            return state;
+    }
+}
+
+const image = (state = {getting: false, data : {}}, action) => {
+    switch(action.type) {
+        case PLACE.GET:
+            return Object.assign({}, state, {getting : true});
+        case PLACE.RECIEVE:
+            return Object.assign({}, state, {getting : false, data : action.data});
         default:
             return state;
     }
@@ -137,9 +162,11 @@ const app = combineReducers({
     auth,
     placeExplorer,
     placeCreator,
+    place,
     search,
     notifications,
-    dimensions
+    dimensions,
+    image,
   })
 
 export default app;

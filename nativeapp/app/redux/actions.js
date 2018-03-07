@@ -31,6 +31,18 @@ export const PLACE_EXPLORER = {
     }
 }
 
+export const PLACE = {
+    GET : 'PLACE_GET',
+    RECIEVE : 'PLACE_RECIEVE',
+    CLOSE : 'PLACE_CLOSE'
+}
+
+export const IMAGE = {
+    GET : 'IMAGE_GET',
+    RECIEVE : 'IMAGE_RECIEVE',
+    CLOSE : 'IMAGE_CLOSE'
+}
+
 export const TOGGLE_SEARCHQUERIES = {
     MAP : {
         EXPAND : 'TOGGLE_SQ_EXPAND',
@@ -182,6 +194,68 @@ export const fetchPlaces = (filter, scrollLevel) => {
     
 }
 
+
+
+export const getPlace = (index) => {
+    return {
+        type: PLACE.GET,
+    }
+}
+
+export const recievePlace = (data) => {
+    return {
+        type: PLACE.RECIEVE,
+        data: data
+    }
+}
+
+export const closePlace = () => {
+    return {
+        type: PLACE.CLOSE
+    }
+}
+
+export const fetchPlace = (id) => {
+    return dispatch => {
+        dispatch(getPlace(id));
+        return axios.get('http://localhost:8850/api/pe-place', id)
+        .then((res) => {
+            dispatch(recievePlace(res.data));
+        })
+        .catch((err) => {
+            console.log(err)
+            dispatch(recievePlace(null))
+        })
+    }
+}
+
+export const getImage = (src) => {
+    return {
+        type: IMAGE.GET,
+    }
+}
+
+export const recieveImage = (src, data) => {
+    return {
+        type: IMAGE.RECIEVE,
+        data: {src, data}
+    }
+}
+
+
+export const fetchImage = (src) => {
+    return dispatch => {
+        dispatch(getImage(src));
+        return axios.get('http://localhost:8850/api/get-image', src)
+        .then((res) => {
+            dispatch(recieveImage(src, res.data));
+        })
+        .catch((err) => {
+            console.log(err)
+            dispatch(recieveImage(null, null))
+        })
+    }
+}
 
 
 

@@ -7,10 +7,11 @@ import Map from '../map/map.js';
 import Header from '../header/header.js';
 import Promotions from './promotions.js';
 import PlaceExplorer from './placeExplorer.js';
+import { PlaceExpanded } from './placeExplorer.js';
 import TabBar from './tabBar.js'
 
 import { appColors, appFontSizes } from '../assets/appStyles.js'
-import { expandPE, shrinkPE, fetchPlaces } from '../redux/actions';
+import { expandPE, shrinkPE, fetchPlaces, fetchPlace, closePlace } from '../redux/actions';
 import { connect } from 'react-redux';
 
 class Dashboard extends React.Component {
@@ -214,10 +215,21 @@ class Dashboard extends React.Component {
               </View>
             </View>
               <TabBar fetchPlaces={(filter, scrollLevel) => this.props.dispatch(fetchPlaces(filter, scrollLevel))}/>
-              <PlaceExplorer data={this.props.placeExplorer.data}/>
+              <PlaceExplorer data={this.props.placeExplorer.data} fetchPlace={(id) => this.props.dispatch(fetchPlace(id))} plExpanded={this.props.plExpanded} screenDimensions={this.props.screenDimensions}/>
             </Animated.View>
                   
         </Animated.View>
+        {this.props.plExpanded && <PlaceExpanded
+          screenDimensions={this.props.screenDimensions}
+          isIphoneX={this.props.isIphoneX}
+          name={this.props.placeData.name}
+          subcategory={this.props.placeData.subcategory}
+          description={this.props.placeData.description}
+          rating={this.props.placeData.rating}
+          photos={this.props.placeData.photos}
+          src={this.props.placeData.photos[0].srcLarge}
+          close={() => this.props.dispatch(closePlace())}
+          />}
         <Image
           style={styles.bg_top}
           source={require('../background/bg-top.png')}
@@ -232,7 +244,13 @@ const mapStateToProps = (state, ownProps) => {
   return {
     screenDimensions : state.dimensions.screenDimensions,
     placeExplorer : state.placeExplorer,
-    peExpand : state.placeExplorer.peExpand
+    peExpand : state.placeExplorer.peExpand,
+    isIphoneX : state.dimensions.isIphoneX,
+    image: state.image.data,
+    imageLoading: state.image.loading,
+    plExpanded : state.place.expand,
+    plLoading : state.place.getting,
+    placeData : state.place.data
   }
 }
  
@@ -248,3 +266,4 @@ const DashboardLinked= connect(
 )(Dashboard);
 
 export default DashboardLinked;
+

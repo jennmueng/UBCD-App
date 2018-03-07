@@ -3,7 +3,8 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const fs = require('fs');
-const DataURI = require('datauri').promise;
+const DataURI = require('datauri').sync;
+const uriPromise = require('datauri').promise;
 
 //import Schemas
 const user = require('./models/user.js');
@@ -111,7 +112,7 @@ app.get('/api/pe-content', (req, res) => {
             address : '23 Soi Luang, Tambon Nai Mueang, Amphoe Mueang Ubon Ratchathani, Chang Wat Ubon Ratchathani 34000',
             totalRateCount : 90,
             totalRateValue : 11,
-            rating : 9.25,
+            rating : 9.3,
             expenseLevel : 3,
             reviews : [],
             photos : [
@@ -128,14 +129,126 @@ app.get('/api/pe-content', (req, res) => {
             creationDate : new Date(),
             owner : null,
             verified : true
+        },
+        {
+            _id: 234,
+            coordinates : {
+                lat : 15.740092,
+                long : 104.253332
+            },
+            name : `Khun Yai's Pad Thai`,
+            description : `An old store that has been here for years`,
+            subcategory : `Thai Food`,
+            category : 'Food',
+            phone : `094394394`,
+            website : null,
+            address : '23 Soi Luang, Tambon Nai Mueang, Amphoe Mueang Ubon Ratchathani, Chang Wat Ubon Ratchathani 34000',
+            totalRateCount : 90,
+            totalRateValue : 11,
+            rating : 6.8,
+            expenseLevel : 1,
+            reviews : [],
+            photos : [
+                {
+                    author : null,
+                    place : 123,
+                    likes : 10,
+                    creationDate : new Date(),
+                    srcLarge : './clientAssets/images/places/padthai.jpg',
+                    srcThumb : './clientAssets/images/places/padthai.jpg',
+                }
+            ],
+            likes : 26,
+            creationDate : new Date(),
+            owner : null,
+            verified : true
+        },
+        {
+            _id: 234,
+            coordinates : {
+                lat : 15.740092,
+                long : 104.253332
+            },
+            name : `Little Pawn Shop`,
+            description : `An old store that has been here for years`,
+            subcategory : `Shop`,
+            category : 'Attractions',
+            phone : `094394394`,
+            website : null,
+            address : '23 Soi Luang, Tambon Nai Mueang, Amphoe Mueang Ubon Ratchathani, Chang Wat Ubon Ratchathani 34000',
+            totalRateCount : 90,
+            totalRateValue : 11,
+            rating : 8.6,
+            expenseLevel : 2,
+            reviews : [],
+            photos : [
+                {
+                    author : null,
+                    place : 123,
+                    likes : 10,
+                    creationDate : new Date(),
+                    srcLarge : './clientAssets/images/places/pawnshop.jpg',
+                    srcThumb : './clientAssets/images/places/pawnshop.jpg',
+                }
+            ],
+            likes : 26,
+            creationDate : new Date(),
+            owner : null,
+            verified : true
         }
     ]
-    DataURI(placeholderPlaces[0].photos[0].srcThumb)
-        .then(content => {
-            placeholderPlaces[0].photos[0].srcThumb = content;
-            res.send(placeholderPlaces);
+    for (let i = 0; i < placeholderPlaces.length; i++) {
+        let datauri = DataURI(placeholderPlaces[i].photos[0].srcThumb);
+        placeholderPlaces[i].photos[0].thumbUri = datauri;
+    }
+    res.send(placeholderPlaces);
+})
+
+app.get('/api/pe-place', (req, res) => {
+    let placeholderPlace = 
+        {
+            _id: 123,
+            coordinates : {
+                lat : 15.240092,
+                long : 104.853332
+            },
+            name : `Steve's Bakery`,
+            description : `The best bakery in Ubon`,
+            subcategory : `Cafe`,
+            category : 'Food',
+            phone : `0863937528`,
+            website : null,
+            address : '23 Soi Luang, Tambon Nai Mueang, Amphoe Mueang Ubon Ratchathani, Chang Wat Ubon Ratchathani 34000',
+            totalRateCount : 90,
+            totalRateValue : 11,
+            rating : 9.3,
+            expenseLevel : 3,
+            reviews : [],
+            photos : [
+                {
+                    author : null,
+                    place : 123,
+                    likes : 10,
+                    creationDate : new Date(),
+                    srcLarge : './clientAssets/images/places/stevesbakery.jpg',
+                    srcThumb : './clientAssets/images/places/stevesbakery.jpg',
+                }
+            ],
+            likes : 26,
+            creationDate : new Date(),
+            owner : null,
+            verified : true
+        };
+    res.send(placeholderPlace);
+});
+
+app.post('/api/get-image', (req, res) => {
+    let src = req.body.src;
+    uriPromise(src)
+        .then(uri => {
+            res.send({err: null, uri : uri});
         })
-        .catch(err => { throw err; });
+        .catch(err => { console.log(err); res.send({err}) });
 })
 
 app.listen('8850');
