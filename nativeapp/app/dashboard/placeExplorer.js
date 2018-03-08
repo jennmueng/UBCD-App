@@ -402,17 +402,49 @@ export class PlaceExpanded extends React.Component {
             extraReview : {
                 height: this.props.isIphoneX ? 85 : 70
             },
-            review : {
-                width: this.props.screenDimensions.width - 26,
-                height: 120,
-                backgroundColor: 'white',
-                zIndex: 4,
-                shadowColor: '#000',
-                borderRadius: 6,
+            reviewShadow: {
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.12,
                 shadowRadius: 12,
+                shadowColor: '#000',
+                borderRadius: 6,
                 marginBottom: 15,
+                width: this.props.screenDimensions.width - 26,
+                height: 120,
+                zIndex: 4,
+            },
+            review : {
+                width: this.props.screenDimensions.width - 26,
+                height: '100%',
+                backgroundColor: 'white',
+                borderRadius: 6,
+                padding: 10,
+                overflow: 'hidden',
+                flexDirection: 'row',
+                alignItems:'center',
+                justifyContent: 'space-between'
+            },
+            reviewTextArea : {
+                flex: 1
+            },
+            reviewText : {
+                flex: 1,
+                fontSize: 16,
+                maxWidth: this.props.screenDimensions.width - 66,
+                color: appColors.mainText,
+            },
+            reviewRateArea : {
+                position: 'absolute',
+                right: 0,
+                height: 120,
+                width: 40,
+                justifyContent: 'center',
+                alignItems: 'center',
+            },
+            reviewRateText : {
+                fontSize: 20,
+                color: 'white',
+                fontWeight: '700'
             },
             back : {
                 position: 'absolute',
@@ -481,10 +513,21 @@ export class PlaceExpanded extends React.Component {
                     </View>
                         <FlatList style={styles.reviewArea} 
                             data={this.props.reviews}
+                            keyExtractor={( item ) => item._id}
                             renderItem={({ item }) =>
-                                <View key={item._id} style={styles.review}>
-                                    <Text>{item.text}</Text>
+                            <View style={styles.reviewShadow}>
+                                <View style={styles.review}>
+                                    <View>
+                                        <Text style={styles.reviewText}>{item.text}</Text>
+                                        <Text>{item.author.name.first + ' ' + item.author.name.last}</Text>
+                                    </View>
+                                    
+                                    <View style={{...styles.reviewRateArea, backgroundColor: item.rate >= 8 ? appColors.blueHighlight : appColors.mediumGray,}}>
+                                        <Text style={styles.reviewRateText}>{item.rate}</Text>
+                                    </View>
+                                    
                                 </View>
+                            </View>
                             } ListFooterComponent={
                             <View style={styles.extraReview}></View>
                         }/>

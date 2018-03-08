@@ -23,7 +23,8 @@ var userSchema = new mongoose.Schema({
 		last : String,
 	},
 	photo: {
-		type: String,
+		srcThumb : String,
+		srcLarge : String
 	},
 	userType : {
 		type: String,

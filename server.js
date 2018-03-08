@@ -226,12 +226,15 @@ app.get('/api/pe-place', (req, res) => {
             reviews : [{
                 _id : '12345',
                 text : 'This place makes the best cakes I have ever tasted',
+                rate : 7,
                 author : {
                     name : {
                         first : 'John',
                         last : 'Smith'
                     },
-                    photo : './clientAssets/images/profilePhotos/johnsmith.jpg',
+                    photo : {
+                        srcThumb : './clientAssets/images/profilePhotos/johnsmith.jpg'
+                    },
                 },
                 photos : [{ 
                     srcThumb : './clientAssets/images/places/stevesbakeryReview1.jpg',
@@ -240,7 +243,26 @@ app.get('/api/pe-place', (req, res) => {
                 likes : 3,
                 creationDate : new Date(),
                 
-            }],
+                },
+                {
+                    _id : '2345',
+                    text : 'Simply Amazing',
+                    rate : 10,
+                    author : {
+                        name : {
+                            first : 'Kelly',
+                            last : 'Rogers'
+                        },
+                        photo : {
+                            srcThumb : './clientAssets/images/profilePhotos/kellyrogers.jpg'
+                        },
+                    },
+                    photos : [],
+                    likes : 4,
+                    creationDate : new Date(),
+                    
+                }
+            ],
             photos : [
                 {
                     author : null,
