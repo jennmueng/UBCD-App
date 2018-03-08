@@ -2,15 +2,15 @@
   "expo": {
     "sdkVersion": "25.0.0",
     "ios": {
-      "bundleIdentifier": "UBCD",
-      "publishBundlePath": "ios/nativeapp2/Supporting/shell-app.bundle",
-      "publishManifestPath": "ios/nativeapp2/Supporting/shell-app-manifest.json"
+      "bundleIdentifier": "uUbon",
+      "publishBundlePath": "ios/uUbon/Supporting/shell-app.bundle",
+      "publishManifestPath": "ios/uUbon/Supporting/shell-app-manifest.json"
     },
     "android": {
-      "package": "UBCD"
+      "package": "uUbon"
     },
-    "name": "nativeapp2",
-    "slug": "nativeapp2",
+    "name": "uUbon",
+    "slug": "uUbon",
     "version": "0.1.0",
     "isDetached": true,
     "detach": {

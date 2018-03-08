@@ -31,7 +31,7 @@ export default class Header extends React.Component {
     return (
       <View style={styles.header}>
         <Icon name='edit' size={22} color={appColors.white} />
-        <Image style={styles.logo} source={require('./logo-white.png')}/>
+        
         <Icon name='user' size={22} color={appColors.white} />
       </View>
     );

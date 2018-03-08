@@ -69,9 +69,9 @@ const placeExplorer = (state = {
 const place = (state = {getting: false, expand: false, data : tempPlace}, action) => {
     switch(action.type) {
         case PLACE.GET:
-            return Object.assign({}, state, {getting : true, expand: true});
+            return Object.assign({}, state, {getting : true});
         case PLACE.RECIEVE:
-            return Object.assign({}, state, {getting : false, data : action.data});
+            return Object.assign({}, state, {getting : false, expand: true, data : action.data});
         case PLACE.CLOSE:
             return Object.assign({}, state, {getting : false, expand: false});
         default:

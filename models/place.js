@@ -56,8 +56,12 @@ placeSchema.statics.textSearch = (stringInput, scrollAmount, currentLoc, callbac
         .skip(scrollAmount * 15)
         .limit(15)
         .exec((err, results) => {
-            //Send the data to frontend.
-        });
+            if (err || !results) {
+                return callback(err);
+            } else {
+                return callback(null, results)
+            }
+        }))
 }
 
 placeSchema.pre('save', (next) => {

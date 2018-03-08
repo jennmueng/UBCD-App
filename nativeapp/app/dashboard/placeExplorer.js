@@ -197,7 +197,6 @@ export class PlaceExpanded extends React.Component {
     loadCover = () => {
         axios.post('http://localhost:8850/api/get-image', {src : this.props.src})
         .then((res) => {
-            console.log(res)
             if (!res.data.err) {
                 this.setState({
                     coverLoaded: true,
@@ -235,6 +234,7 @@ export class PlaceExpanded extends React.Component {
         
     }
     componentDidMount() {
+        
         this.loadCover();
         Animated.parallel([
             Animated.spring(
@@ -275,7 +275,6 @@ export class PlaceExpanded extends React.Component {
                 position: 'absolute',
                 bottom: 0,
                 paddingTop: 15,
-                paddingLeft: 15,
                 zIndex: 3
             },
             contentContainer: {
@@ -393,11 +392,19 @@ export class PlaceExpanded extends React.Component {
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.12,
                 shadowRadius: 12,
-                marginBottom: 15,
+                marginLeft: 13
             },
-            reviewBox : {
+            reviewArea : {
+                width: '100%',
+                paddingTop: 15,
+                paddingLeft: 15
+            },
+            extraReview : {
+                height: this.props.isIphoneX ? 85 : 70
+            },
+            review : {
                 width: this.props.screenDimensions.width - 26,
-                height: 500,
+                height: 120,
                 backgroundColor: 'white',
                 zIndex: 4,
                 shadowColor: '#000',
@@ -405,6 +412,7 @@ export class PlaceExpanded extends React.Component {
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.12,
                 shadowRadius: 12,
+                marginBottom: 15,
             },
             back : {
                 position: 'absolute',
@@ -471,7 +479,15 @@ export class PlaceExpanded extends React.Component {
                         {this.props.photos.length >= 3 && <Image source={{}} />}
                         {this.props.photos.length >= 4 && <Image source={{}} />}
                     </View>
-                    <FlatList />
+                        <FlatList style={styles.reviewArea} 
+                            data={this.props.reviews}
+                            renderItem={({ item }) =>
+                                <View key={item._id} style={styles.review}>
+                                    <Text>{item.text}</Text>
+                                </View>
+                            } ListFooterComponent={
+                            <View style={styles.extraReview}></View>
+                        }/>
                 </ScrollView>
                 
             </Animated.View>

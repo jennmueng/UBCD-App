@@ -29,7 +29,6 @@ class Dashboard extends React.Component {
   componentDidMount() {
   }
   componentDidUpdate() {
-   
     if(this.state.peExpand) {
       this.state.peZIndex.setValue(4);
       Animated.parallel([
@@ -219,7 +218,7 @@ class Dashboard extends React.Component {
             </Animated.View>
                   
         </Animated.View>
-        {this.props.plExpanded && <PlaceExpanded
+        {this.props.plExpanded && this.props.placeData &&<PlaceExpanded
           screenDimensions={this.props.screenDimensions}
           isIphoneX={this.props.isIphoneX}
           name={this.props.placeData.name}
@@ -227,6 +226,7 @@ class Dashboard extends React.Component {
           description={this.props.placeData.description}
           rating={this.props.placeData.rating}
           photos={this.props.placeData.photos}
+          reviews={this.props.placeData.reviews}
           src={this.props.placeData.photos[0].srcLarge}
           close={() => this.props.dispatch(closePlace())}
           />}
