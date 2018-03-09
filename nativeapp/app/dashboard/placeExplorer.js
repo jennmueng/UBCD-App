@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusBar, ScrollView, StyleSheet, Text, View, Image, Button, TouchableHighlight, Animated, FlatList, TouchableOpacity } from 'react-native';
+import { StatusBar, ScrollView, TextInput, StyleSheet, Text, View, Image, Button, TouchableHighlight, Animated, FlatList, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import FaIcon from 'react-native-vector-icons/FontAwesome';
 
@@ -191,11 +191,18 @@ export class PlaceExpanded extends React.Component {
             opacity: new Animated.Value(0),
             attachMode : false,
             attach : new Animated.Value(180),
+            titleBorderRadius: new Animated.Value(6),
+            titleWidth : new Animated.Value(this.props.screenDimensions.width - 14),
+            titleHeight : new Animated.Value(120),
+            titleLeft : new Animated.Value(7),
             coverLoaded : false,
+            bottomMarginControl : new Animated.Value(this.props.isIphoneX ? 95 : 85),
+            backOpacity : new Animated.Value(0),
         }
+        this.handleScroll = this.handleScroll.bind(this);
     }
     loadCover = () => {
-        axios.post('http://localhost:8850/api/get-image', {src : this.props.src})
+        axios.post('http://162.213.250.114:8850/api/get-image', {src : this.props.src})
         .then((res) => {
             if (!res.data.err) {
                 this.setState({
@@ -255,6 +262,118 @@ export class PlaceExpanded extends React.Component {
         ]).start();
         
     }
+    addReviewFocus = () => {
+        console.log('focused');
+        Animated.timing(
+            this.state.bottomMarginControl,
+            {
+                toValue : 300,
+                timing: 300
+            }
+        ).start();
+    }
+    handleScroll(event) {
+        if(event.nativeEvent.contentOffset.y > 30) {
+            this.setState({
+                attachMode : true
+            }, () => {
+                //Scroll down and attach
+                Animated.parallel([
+                    Animated.timing(
+                        this.state.attach,
+                        {
+                            toValue: 0,
+                            duration: 200
+                        }
+                    ),
+                    Animated.timing(
+                        this.state.titleLeft,
+                        {
+                            toValue: 0,
+                            duration: 200
+                        }
+                    ),
+                    Animated.timing(
+                        this.state.titleWidth,
+                        {
+                            toValue: this.props.screenDimensions.width,
+                            duration: 100
+                        }
+                    ),
+                    Animated.timing(
+                        this.state.titleHeight,
+                        {
+                            toValue: this.props.isIphoneX ? 180 : 170,
+                            duration: 100
+                        }
+                    ),
+                    Animated.timing(
+                        this.state.titleBorderRadius,
+                        {
+                            toValue: 0,
+                            duration: 200
+                        }
+                    ),
+                    Animated.timing(
+                        this.state.backOpacity,
+                        {
+                            toValue: 1,
+                            duration: 200
+                        }
+                    ),
+                ]).start();
+            })
+        } else {
+            this.setState({
+                attachMode : false
+            }, () => {
+                Animated.parallel([
+                    Animated.timing(
+                        this.state.attach,
+                        {
+                            toValue: 180,
+                            duration: 200
+                        }
+                    ),
+                    Animated.timing(
+                        this.state.titleLeft,
+                        {
+                            toValue: 7,
+                            duration: 200
+                        }
+                    ),
+                    Animated.timing(
+                        this.state.titleWidth,
+                        {
+                            toValue: this.props.screenDimensions.width - 14,
+                            duration: 200
+                        }
+                    ),
+                    Animated.timing(
+                        this.state.titleHeight,
+                        {
+                            toValue: 120,
+                            duration: 200
+                        }
+                    ),
+                    Animated.timing(
+                        this.state.titleBorderRadius,
+                        {
+                            toValue: 6,
+                            duration: 200
+                        }
+                    ),
+                    Animated.timing(
+                        this.state.backOpacity,
+                        {
+                            toValue: 0,
+                            duration: 200
+                        }
+                    ),
+                ]).start();
+            })
+        }
+    }
     render() {
         let styles = {
             expandedBacking : {
@@ -269,9 +388,17 @@ export class PlaceExpanded extends React.Component {
                 width: '100%',
                 height: 240
             },
+            topView : {
+                width: '100%',
+                height: 60,
+                backgroundColor: 'white',
+                position: 'absolute',
+                top: 0,
+                zIndex: 5
+            },
             scrollBox : {
                 width: '100%',
-                height: this.props.screenDimensions.height - 240,
+                height: this.state.attachMode ? this.props.screenDimensions.height - (this.props.isIphoneX ? 180 : 170) : this.props.screenDimensions.height - 240,
                 position: 'absolute',
                 bottom: 0,
                 paddingTop: 15,
@@ -282,22 +409,20 @@ export class PlaceExpanded extends React.Component {
                 alignItems: 'center'
             },
             titleBoxShadow : {
-                borderRadius: 6,
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.12,
                 shadowRadius: 12,
                 shadowColor: '#000',
                 position: 'absolute',
-                top: 180,
-                left: 7,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'flex-end',
                 zIndex: 4,
             },
             titleBox : {
-                width: this.props.screenDimensions.width - 14,
                 height: 120,
                 backgroundColor: 'white',
                 zIndex: 4,
-                borderRadius: 6,
                 padding: 10,
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -374,7 +499,6 @@ export class PlaceExpanded extends React.Component {
                 marginLeft: 8
             },
             buttonArea : {
-                width: this.props.screenDimensions.width - 14,
                 height: 40,
                 position: 'absolute',
                 bottom: 0,
@@ -446,10 +570,21 @@ export class PlaceExpanded extends React.Component {
                 color: 'white',
                 fontWeight: '700'
             },
+            addReview : {
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.12,
+                shadowRadius: 12,
+                shadowColor: '#000',
+                borderRadius: 6,
+                width: this.props.screenDimensions.width - 26,
+                minHeight: 120,
+                
+            },
             back : {
                 position: 'absolute',
                 top: this.props.isIphoneX ? 30 : 20,
                 left: 0,
+                zIndex: 5,
                 flexDirection: 'row',
                 alignItems: 'center'
             },
@@ -463,17 +598,25 @@ export class PlaceExpanded extends React.Component {
         }
         return (
             <Animated.View style={{...styles.expandedBacking, transform:([{scale : this.state.scale}]), opacity: this.state.opacity}}>
-                 <StatusBar barStyle='light-content' />
-                <Image 
+                 {this.state.attachMode ?< StatusBar barStyle='dark-content' /> : <StatusBar barStyle='light-content' />}
+                { this.state.attachMode ? null :<Image 
                     style={styles.cover}
                     source={this.state.coverLoaded ? {uri: this.state.coverUri} : require('../assets/tempimage.jpg')}
-                />
+                />}
                 <TouchableOpacity style={styles.back} onPress={() => this.closeProcess()}>
-                    <Icon name='chevron-left' size={34} color={'white'} />
-                    <Text style={styles.backText}>Back</Text>
+                        <Icon name='chevron-left' size={34} color={this.state.attachMode ? 'black' : 'white'} />
+                        <Text style={styles.backText}>Back</Text>
                 </TouchableOpacity>
-                <View style={styles.titleBoxShadow}>
-                    <View style={styles.titleBox}> 
+                <Animated.View style={{...styles.titleBoxShadow, 
+                    top: this.state.attach,
+                    height: this.state.titleHeight,
+                    borderRadius: this.state.titleBorderRadius,
+                    left: this.state.titleLeft
+                    }}>
+                    <Animated.View style={{...styles.titleBox, 
+                        borderRadius: this.state.titleBorderRadius, 
+                        width: this.state.titleWidth
+                        }}> 
                         <View style={styles.info}>
                             <Text style={styles.name}>{this.props.name}</Text>
                             <Text style={styles.subcategory}>{this.props.subcategory}</Text>
@@ -487,7 +630,9 @@ export class PlaceExpanded extends React.Component {
                                 800m
                             </Text>
                         </View>
-                        <View style={styles.buttonArea} >
+                        <Animated.View style={{...styles.buttonArea,
+                            width: this.state.titleWidth
+                        }} >
                             <TouchableHighlight style={styles.callButtonCover} onPress={() => {}} underlayColor={appColors.lightGray}>
                                 <View style={styles.callButton}>
                                     <Icon name='phone' size={20} color={appColors.blueHighlight}/>
@@ -500,10 +645,10 @@ export class PlaceExpanded extends React.Component {
                                     <Text style={styles.buttonText}>Map</Text>
                                 </View>   
                             </TouchableHighlight>
-                        </View>
-                    </View>
-                </View>
-                <ScrollView style={styles.scrollBox}>
+                        </Animated.View>
+                    </Animated.View>
+                </Animated.View>
+                <ScrollView style={styles.scrollBox} onScroll={this.handleScroll} scrollEventThrottle={16}>
                     <View style={styles.freeBox}>
                         </View>
                     <View style={styles.photoBox}>
@@ -529,7 +674,9 @@ export class PlaceExpanded extends React.Component {
                                 </View>
                             </View>
                             } ListFooterComponent={
-                            <View style={styles.extraReview}></View>
+                            <Animated.View style={{...styles.addReview, marginBottom: this.state.bottomMarginControl}}>
+                                <TextInput onFocus={() => this.addReviewFocus()} placeholder='Review this place...' />
+                            </Animated.View>
                         }/>
                 </ScrollView>
                 

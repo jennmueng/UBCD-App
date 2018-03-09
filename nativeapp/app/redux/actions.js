@@ -182,7 +182,7 @@ export const recievePlacesOverWrite = (data) => {
 export const fetchPlaces = (filter, scrollLevel) => {
     return dispatch => {
         dispatch(getPlaces(filter));
-        return axios.get('http://localhost:8850/api/pe-content', filter, scrollLevel)
+        return axios.get('http://162.213.250.114:8850/api/pe-content', filter, scrollLevel)
         .then((res) => {
             dispatch(recievePlacesOverWrite(res.data));
         })
@@ -218,7 +218,7 @@ export const closePlace = () => {
 export const fetchPlace = (id) => {
     return dispatch => {
         dispatch(getPlace(id));
-        return axios.get('http://localhost:8850/api/pe-place', id)
+        return axios.get('http://162.213.250.114:8850/api/pe-place', id)
         .then((res) => {
             dispatch(recievePlace(res.data));
         })
@@ -246,7 +246,7 @@ export const recieveImage = (src, data) => {
 export const fetchImage = (src) => {
     return dispatch => {
         dispatch(getImage(src));
-        return axios.get('http://localhost:8850/api/get-image', src)
+        return axios.get('http://162.213.250.114:8850/api/get-image', src)
         .then((res) => {
             dispatch(recieveImage(src, res.data));
         })
