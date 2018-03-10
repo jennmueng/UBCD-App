@@ -211,7 +211,7 @@ export class PlaceExpanded extends React.Component {
         this.handleScroll = this.handleScroll.bind(this);
     }
     loadCover = () => {
-        axios.post('http://localhost:8850/api/get-image', {src : this.props.src})
+        axios.post('http://162.213.250.114:8850/api/get-image', {src : this.props.src})
         .then((res) => {
             if (!res.data.err) {
                 this.setState({
@@ -387,7 +387,7 @@ export class PlaceExpanded extends React.Component {
         }
     }
     imageFull = (src) => {
-        axios.post('http://localhost:8850/api/get-image', {src : src})
+        axios.post('http://162.213.250.114:8850/api/get-image', {src : src})
         .then((res) => {
             if (!res.data.err) {
                 this.setState({
