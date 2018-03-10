@@ -56,11 +56,11 @@ const placeExplorer = (state = {
         case PLACE_EXPLORER.SHRINK:
             return Object.assign({}, state, {peExpand : false, peExpandType : null});
         case PLACE_EXPLORER.GET:
-            return Object.assign({}, state, {gettingPeContent : true});
+            return Object.assign({}, state, {loading : true});
         case PLACE_EXPLORER.RECIEVE.OVERWRITE:
-            return Object.assign({}, state, {gettingPeContent : false, data : action.data});
+            return Object.assign({}, state, {loading : false, data : action.data});
         case PLACE_EXPLORER.RECIEVE.ADD:
-            return Object.assign({}, state, {gettingPeContent : false, data : [...state.data, ...action.data]});
+            return Object.assign({}, state, {loading : false, data : [...state.data, ...action.data]});
         default:
             return state;
     }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusBar, ScrollView, TextInput, StyleSheet, Text, View, Image, Button, TouchableHighlight, Animated, FlatList, TouchableOpacity } from 'react-native';
+import { StatusBar, ActivityIndicator,ScrollView, TextInput, StyleSheet, Text, View, Image, Button, TouchableHighlight, Animated, FlatList, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import FaIcon from 'react-native-vector-icons/FontAwesome';
 
@@ -18,6 +18,14 @@ export default class PlaceExplorer extends React.Component {
             contentContainer: {
                 justifyContent: 'center',
                 alignItems: 'center'
+            },
+            
+            loading: {
+            flex: 1,
+            height: 120,
+            width: '100%',
+            alignItems: 'center',
+            justifyContent: 'center'
             },
             extra : {
                 height: 60
@@ -41,6 +49,7 @@ export default class PlaceExplorer extends React.Component {
         )
         return (
             <ScrollView contentContainerStyle={styles.contentContainer} style={styles.placeExplorer}>
+            {this.props.loading && <View style={styles.loading}><ActivityIndicator size="large" color={appColors.mediumGray} /></View>}
                 {placeArray}
                 <View style={styles.extra}></View>
                 
@@ -202,7 +211,7 @@ export class PlaceExpanded extends React.Component {
         this.handleScroll = this.handleScroll.bind(this);
     }
     loadCover = () => {
-        axios.post('http://162.213.250.114:8850/api/get-image', {src : this.props.src})
+        axios.post('http://localhost:8850/api/get-image', {src : this.props.src})
         .then((res) => {
             if (!res.data.err) {
                 this.setState({
@@ -263,67 +272,70 @@ export class PlaceExpanded extends React.Component {
         
     }
     addReviewFocus = () => {
-        console.log('focused');
-        Animated.timing(
-            this.state.bottomMarginControl,
-            {
-                toValue : 300,
-                timing: 300
-            }
-        ).start();
+        this.state.bottomMarginControl.setValue(290)
+        setTimeout(() => {
+            this.scrollBox.scrollToEnd({animated: true});
+        }, 10)
+    }
+    addReviewFocusOut = () => {
+        this.state.bottomMarginControl.setValue(this.props.isIphoneX ? 95 : 85)
+        setTimeout(() => {
+            this.scrollBox.scrollToEnd({animated: true});
+        }, 10)
     }
     handleScroll(event) {
-        if(event.nativeEvent.contentOffset.y > 30) {
+        if(event.nativeEvent.contentOffset.y > 30 && !this.state.attachMode) {
+             //Scroll down and attach
+             Animated.parallel([
+                Animated.timing(
+                    this.state.attach,
+                    {
+                        toValue: 0,
+                        duration: 200
+                    }
+                ),
+                Animated.timing(
+                    this.state.titleLeft,
+                    {
+                        toValue: 0,
+                        duration: 200
+                    }
+                ),
+                Animated.timing(
+                    this.state.titleWidth,
+                    {
+                        toValue: this.props.screenDimensions.width,
+                        duration: 100
+                    }
+                ),
+                Animated.timing(
+                    this.state.titleHeight,
+                    {
+                        toValue: this.props.isIphoneX ? 180 : 170,
+                        duration: 100
+                    }
+                ),
+                Animated.timing(
+                    this.state.titleBorderRadius,
+                    {
+                        toValue: 0,
+                        duration: 200
+                    }
+                ),
+                Animated.timing(
+                    this.state.backOpacity,
+                    {
+                        toValue: 1,
+                        duration: 200
+                    }
+                ),
+            ]).start();
             this.setState({
                 attachMode : true
             }, () => {
-                //Scroll down and attach
-                Animated.parallel([
-                    Animated.timing(
-                        this.state.attach,
-                        {
-                            toValue: 0,
-                            duration: 200
-                        }
-                    ),
-                    Animated.timing(
-                        this.state.titleLeft,
-                        {
-                            toValue: 0,
-                            duration: 200
-                        }
-                    ),
-                    Animated.timing(
-                        this.state.titleWidth,
-                        {
-                            toValue: this.props.screenDimensions.width,
-                            duration: 100
-                        }
-                    ),
-                    Animated.timing(
-                        this.state.titleHeight,
-                        {
-                            toValue: this.props.isIphoneX ? 180 : 170,
-                            duration: 100
-                        }
-                    ),
-                    Animated.timing(
-                        this.state.titleBorderRadius,
-                        {
-                            toValue: 0,
-                            duration: 200
-                        }
-                    ),
-                    Animated.timing(
-                        this.state.backOpacity,
-                        {
-                            toValue: 1,
-                            duration: 200
-                        }
-                    ),
-                ]).start();
+               
             })
-        } else {
+        } else if (event.nativeEvent.contentOffset.y <= 30 && this.state.attachMode) {
             this.setState({
                 attachMode : false
             }, () => {
@@ -373,6 +385,26 @@ export class PlaceExpanded extends React.Component {
                 ]).start();
             })
         }
+    }
+    imageFull = (src) => {
+        axios.post('http://localhost:8850/api/get-image', {src : src})
+        .then((res) => {
+            if (!res.data.err) {
+                this.setState({
+                    showImage: true,
+                    showImageUri : res.data.uri
+                })
+            }
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+    }
+    closeImage = () => {
+        this.setState({
+            showImage: false,
+            showImageUri : null
+        })
     }
     render() {
         let styles = {
@@ -506,17 +538,58 @@ export class PlaceExpanded extends React.Component {
                 borderTopWidth: 1.5,
                 borderColor: appColors.lightGray,
             },
-            photoBox : {
+            photoBoxShadow : {
                 width: this.props.screenDimensions.width - 26,
                 height: 240,
-                backgroundColor: 'white',
                 zIndex: 4,
-                shadowColor: '#000',
-                borderRadius: 6,
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.12,
                 shadowRadius: 12,
-                marginLeft: 13
+                shadowColor: '#000',
+                marginLeft: 14,
+                borderRadius: 6,
+            },
+            photoBox : {
+                
+                backgroundColor: 'white',
+                width: '100%',
+                height: '100%',
+                borderRadius: 6,
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                flex: 1,
+                overflow: 'hidden',
+            },
+            gal1Cover : {
+                height: '50%',
+                width: '50%',
+                borderWidth: 3,
+                borderColor: 'white',
+                borderRadius: 6,
+            },
+            gal2Cover : {
+                height: '50%',
+                width: '50%',
+                borderWidth: 3,
+                borderColor: 'white',
+                borderRadius: 6,
+            },
+            gal1 : {
+                height: '100%',
+                width: '100%',
+                borderRadius: 4,
+            },
+            gal2 : {
+                height: '100%',
+                width: '100%',
+                borderRadius: 4,
+            },
+            gal3 : {
+                height: '50%',
+                width: '100%',
+                borderWidth: 3,
+                borderColor: 'white',
+                borderRadius: 6,
             },
             reviewArea : {
                 width: '100%',
@@ -570,6 +643,26 @@ export class PlaceExpanded extends React.Component {
                 color: 'white',
                 fontWeight: '700'
             },
+            reviewProf : {
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+            },
+            reviewProfPic : {
+                width: 30,
+                height: 30,
+                marginRight: 5,
+                borderRadius: 15,
+            },
+            reviewProfText : {
+                fontSize: 14,
+                color: appColors.mainText
+            },
+            addButtonArea : {
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+                alignItems: 'center'
+            },
             addReview : {
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.12,
@@ -577,8 +670,27 @@ export class PlaceExpanded extends React.Component {
                 shadowColor: '#000',
                 borderRadius: 6,
                 width: this.props.screenDimensions.width - 26,
-                minHeight: 120,
+                minHeight: 60,
+                padding: 10
                 
+            },
+            addReviewText : {
+                fontSize: 16,
+                marginBottom: 5,
+            },
+            postButton : {
+                height: 34,
+                width: 80,
+                backgroundColor: appColors.blueHighlight,
+                borderRadius: 17,
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'row',
+            },
+            post : {
+                color: 'white',
+                fontSize: 16,
+                fontWeight: '500'
             },
             back : {
                 position: 'absolute',
@@ -589,7 +701,6 @@ export class PlaceExpanded extends React.Component {
                 alignItems: 'center'
             },
             backText : {
-                color: 'white',
                 fontSize: 18
             },
             freeBox : {
@@ -598,6 +709,7 @@ export class PlaceExpanded extends React.Component {
         }
         return (
             <Animated.View style={{...styles.expandedBacking, transform:([{scale : this.state.scale}]), opacity: this.state.opacity}}>
+            {this.state.showImage && <ImageFullScreen close={this.closeImage} uri={this.state.showImageUri} />}
                  {this.state.attachMode ?< StatusBar barStyle='dark-content' /> : <StatusBar barStyle='light-content' />}
                 { this.state.attachMode ? null :<Image 
                     style={styles.cover}
@@ -605,7 +717,7 @@ export class PlaceExpanded extends React.Component {
                 />}
                 <TouchableOpacity style={styles.back} onPress={() => this.closeProcess()}>
                         <Icon name='chevron-left' size={34} color={this.state.attachMode ? 'black' : 'white'} />
-                        <Text style={styles.backText}>Back</Text>
+                        <Text style={{...styles.backText, color: this.state.attachMode ? 'black' : 'white' }}>Back</Text>
                 </TouchableOpacity>
                 <Animated.View style={{...styles.titleBoxShadow, 
                     top: this.state.attach,
@@ -648,13 +760,15 @@ export class PlaceExpanded extends React.Component {
                         </Animated.View>
                     </Animated.View>
                 </Animated.View>
-                <ScrollView style={styles.scrollBox} onScroll={this.handleScroll} scrollEventThrottle={16}>
+                <ScrollView style={styles.scrollBox} ref={(scrollBox) => this.scrollBox = scrollBox}onScroll={this.handleScroll} scrollEventThrottle={16}>
                     <View style={styles.freeBox}>
                         </View>
-                    <View style={styles.photoBox}>
-                        {this.props.photos.length >= 2 && <Image source={{uri: this.props.photos[1].thumbUri}} />}
-                        {this.props.photos.length >= 3 && <Image source={{}} />}
-                        {this.props.photos.length >= 4 && <Image source={{}} />}
+                    <View style={styles.photoBoxShadow}>
+                        <View style={styles.photoBox}>
+                            {this.props.photos.length >= 2 && <TouchableOpacity style={styles.gal1Cover} onPress={() => this.imageFull(this.props.photos[1].srcLarge)}><Image style={styles.gal1} source={{uri: this.props.photos[1].thumbUri}} /></TouchableOpacity>}
+                            {this.props.photos.length >= 3 && <TouchableOpacity style={styles.gal2Cover} onPress={() => this.imageFull(this.props.photos[2].srcLarge)}><Image style={styles.gal2} source={{uri: this.props.photos[2].thumbUri}} /></TouchableOpacity>}
+                            {this.props.photos.length >= 4 && <Image style={styles.gal3} source={{uri: this.props.photos[3].thumbUri}} />}
+                        </View>
                     </View>
                         <FlatList style={styles.reviewArea} 
                             data={this.props.reviews}
@@ -664,7 +778,11 @@ export class PlaceExpanded extends React.Component {
                                 <View style={styles.review}>
                                     <View>
                                         <Text style={styles.reviewText}>{item.text}</Text>
-                                        <Text>{item.author.name.first + ' ' + item.author.name.last}</Text>
+                                        <View style={styles.reviewProf}>
+                                            <Image style={styles.reviewProfPic} source={{uri : item.author.photo.thumbUri}}/>
+                                            <Text style={styles.reviewProfText}>{item.author.name.first + ' ' + item.author.name.last}</Text>
+                                        </View>
+                                        
                                     </View>
                                     
                                     <View style={{...styles.reviewRateArea, backgroundColor: item.rate >= 8 ? appColors.blueHighlight : appColors.mediumGray,}}>
@@ -675,11 +793,101 @@ export class PlaceExpanded extends React.Component {
                             </View>
                             } ListFooterComponent={
                             <Animated.View style={{...styles.addReview, marginBottom: this.state.bottomMarginControl}}>
-                                <TextInput onFocus={() => this.addReviewFocus()} placeholder='Review this place...' />
+                                <TextInput style={styles.addReviewText} onFocus={() => this.addReviewFocus()} onBlur={() => this.addReviewFocusOut()} placeholder='Review this place...' autoGrow={true} multiline={true}/>
+                                <View style={styles.addButtonArea}>
+                                <TouchableOpacity style={styles.photoButton}onPress={() => {}}>
+                                        <Icon name='image' size={24} color={appColors.mediumGray}/>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.postButton}onPress={() => {}}>
+                                        <Text style={styles.post}>Post</Text>
+                                </TouchableOpacity>
+                                </View>
+                                
                             </Animated.View>
                         }/>
                 </ScrollView>
                 
+            </Animated.View>
+        )
+    }
+}
+
+class ImageFullScreen extends React.Component {
+    constructor(props) {
+        super(props);
+        
+        this.state = {
+            scale : new Animated.Value(.7),
+            opacity : new Animated.Value(0)
+        }
+    }
+    componentDidMount() {
+        Animated.parallel([
+            Animated.spring(
+                this.state.scale,
+                {
+                    toValue: 1,
+                    bounciness: 10,
+                    duration: 350
+                }
+            ),
+            Animated.timing(
+                this.state.opacity,
+                {
+                    toValue: 1,
+                    duration: 60
+                }
+            )
+        ]).start();
+    }
+    close = () => {
+        Animated.parallel([
+            Animated.spring(
+                this.state.scale,
+                {
+                    toValue: 0,
+                    bounciness: 10,
+                    duration: 350
+                }
+            ),
+            Animated.timing(
+                this.state.opacity,
+                {
+                    toValue: 0,
+                    duration: 60
+                }
+            )
+        ]).start();
+        setTimeout(() => {
+            this.props.close();
+        }, 350)
+    }
+    render() {
+        let styles = {
+            view : {
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'black',
+                zIndex: 15,
+                alignItems: 'center',
+                justifyContent: 'center'
+            },
+            image : {
+                width:'100%',
+                height:'80%',
+            },
+            close : {
+                position: 'absolute',
+                top: 20,
+                right: 10,
+            }
+        }
+        return(
+            <Animated.View style={{...styles.view, transform : ([{ scale : this.state.scale}]), opacity : this.state.opacity}}>
+                <TouchableOpacity style={styles.close}onPress={this.props.close}>
+                    <Icon name='x' size={30} color='white' />
+                    </TouchableOpacity>
+                <Image style={styles.image} source={{uri : this.props.uri}}/>
             </Animated.View>
         )
     }

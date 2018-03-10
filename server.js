@@ -205,6 +205,89 @@ app.get('/api/pe-content', (req, res) => {
 })
 
 app.get('/api/pe-place', (req, res) => {
+    
+    let reviews = [{
+        _id : '12345',
+        text : 'This place makes the best cakes I have ever tasted',
+        rate : 7,
+        author : {
+            name : {
+                first : 'John',
+                last : 'Smith'
+            },
+            photo : {
+                srcThumb : './clientAssets/images/profilePhotos/johnsmith.jpg'
+            },
+        },
+        photos : [{ 
+            srcThumb : './clientAssets/images/places/stevesbakeryReview1.jpg',
+            srcLarge : './clientAssets/images/places/stevesbakeryReview1.jpg'
+        }],
+        likes : 3,
+        creationDate : new Date(),
+        
+        },
+        {
+            _id : '2345',
+            text : 'Simply Amazing',
+            rate : 10,
+            author : {
+                name : {
+                    first : 'Kelly',
+                    last : 'Rogers'
+                },
+                photo : {
+                    srcThumb : './clientAssets/images/profilePhotos/kellyrogers.jpg'
+                },
+            },
+            photos : [],
+            likes : 4,
+            creationDate : new Date(),
+            
+        }
+    ];
+    let photos = [
+        {
+            author : null,
+            place : 123,
+            likes : 10,
+            creationDate : new Date(),
+            srcLarge : './clientAssets/images/places/stevesbakery.jpg',
+            srcThumb : './clientAssets/images/places/stevesbakery.jpg',
+        },
+        {
+            author : null,
+            place : 123,
+            likes : 10,
+            creationDate : new Date(),
+            srcLarge : './clientAssets/images/places/stevesbakery1.jpg',
+            srcThumb : './clientAssets/images/places/stevesbakery1.jpg',
+        },
+        {
+            author : null,
+            place : 123,
+            likes : 10,
+            creationDate : new Date(),
+            srcLarge : './clientAssets/images/places/stevesbakery2.jpg',
+            srcThumb : './clientAssets/images/places/stevesbakery2.jpg',
+        },
+        {
+            author : null,
+            place : 123,
+            likes : 10,
+            creationDate : new Date(),
+            srcLarge : './clientAssets/images/places/stevesbakery.jpg',
+            srcThumb : './clientAssets/images/places/stevesbakery.jpg',
+        },
+    ];
+    for (let i = 0; i < reviews.length; i++) {
+        let datauri = DataURI(reviews[i].author.photo.srcThumb);
+        reviews[i].author.photo.thumbUri = datauri;
+    }
+    for (let i = 0; i < photos.length; i++) {
+        let datauri = DataURI(photos[i].srcThumb);
+        photos[i].thumbUri = datauri;
+    }
     let placeholderPlace = 
         {
             _id: 123,
@@ -223,56 +306,8 @@ app.get('/api/pe-place', (req, res) => {
             totalRateValue : 11,
             rating : 9.3,
             expenseLevel : 3,
-            reviews : [{
-                _id : '12345',
-                text : 'This place makes the best cakes I have ever tasted',
-                rate : 7,
-                author : {
-                    name : {
-                        first : 'John',
-                        last : 'Smith'
-                    },
-                    photo : {
-                        srcThumb : './clientAssets/images/profilePhotos/johnsmith.jpg'
-                    },
-                },
-                photos : [{ 
-                    srcThumb : './clientAssets/images/places/stevesbakeryReview1.jpg',
-                    srcLarge : './clientAssets/images/places/stevesbakeryReview1.jpg'
-                }],
-                likes : 3,
-                creationDate : new Date(),
-                
-                },
-                {
-                    _id : '2345',
-                    text : 'Simply Amazing',
-                    rate : 10,
-                    author : {
-                        name : {
-                            first : 'Kelly',
-                            last : 'Rogers'
-                        },
-                        photo : {
-                            srcThumb : './clientAssets/images/profilePhotos/kellyrogers.jpg'
-                        },
-                    },
-                    photos : [],
-                    likes : 4,
-                    creationDate : new Date(),
-                    
-                }
-            ],
-            photos : [
-                {
-                    author : null,
-                    place : 123,
-                    likes : 10,
-                    creationDate : new Date(),
-                    srcLarge : './clientAssets/images/places/stevesbakery.jpg',
-                    srcThumb : './clientAssets/images/places/stevesbakery.jpg',
-                }
-            ],
+            reviews : reviews,
+            photos : photos,
             likes : 26,
             creationDate : new Date(),
             owner : null,

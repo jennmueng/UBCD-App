@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusBar, StyleSheet, Text, TextInput, View, Image, Button, Animated, Easing, TouchableOpacity, TouchableHighlight } from 'react-native';
+import { StatusBar,  StyleSheet, Text, TextInput, View, Image, Button, Animated, Easing, TouchableOpacity, TouchableHighlight } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { TabNavigator } from 'react-navigation';
 
@@ -214,7 +214,8 @@ class Dashboard extends React.Component {
               </View>
             </View>
               <TabBar fetchPlaces={(filter, scrollLevel) => this.props.dispatch(fetchPlaces(filter, scrollLevel))}/>
-              <PlaceExplorer data={this.props.placeExplorer.data} fetchPlace={(id) => this.props.dispatch(fetchPlace(id))} plExpanded={this.props.plExpanded} screenDimensions={this.props.screenDimensions}/>
+              
+              <PlaceExplorer loading={this.props.placeExplorer.loading} data={this.props.placeExplorer.data} fetchPlace={(id) => this.props.dispatch(fetchPlace(id))} plExpanded={this.props.plExpanded} screenDimensions={this.props.screenDimensions}/>
             </Animated.View>
                   
         </Animated.View>
