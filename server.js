@@ -244,6 +244,24 @@ app.get('/api/pe-place', (req, res) => {
             likes : 4,
             creationDate : new Date(),
             
+        },
+        {
+            _id : '23434',
+            text : 'Extremely Good.',
+            rate : 8,
+            author : {
+                name : {
+                    first : 'Stanley',
+                    last : 'King'
+                },
+                photo : {
+                    srcThumb : './clientAssets/images/profilePhotos/stanleyking.jpg'
+                },
+            },
+            photos : [],
+            likes : 4,
+            creationDate : new Date(),
+            
         }
     ];
     let photos = [

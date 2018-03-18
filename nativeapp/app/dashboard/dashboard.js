@@ -113,6 +113,7 @@ class Dashboard extends React.Component {
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.12,
         shadowRadius: 12,
+        elevation: 10,
         width: '100%',
         position: 'absolute',
         borderBottomLeftRadius: 0,

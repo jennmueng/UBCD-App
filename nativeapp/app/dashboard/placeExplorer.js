@@ -211,7 +211,7 @@ export class PlaceExpanded extends React.Component {
         this.handleScroll = this.handleScroll.bind(this);
     }
     loadCover = () => {
-        axios.post('http://162.213.250.114:8850/api/get-image', {src : this.props.src})
+        axios.post('http://192.168.0.101:8850/api/get-image', {src : this.props.src})
         .then((res) => {
             if (!res.data.err) {
                 this.setState({
@@ -387,7 +387,7 @@ export class PlaceExpanded extends React.Component {
         }
     }
     imageFull = (src) => {
-        axios.post('http://162.213.250.114:8850/api/get-image', {src : src})
+        axios.post('http://192.168.0.101:8850/api/get-image', {src : src})
         .then((res) => {
             if (!res.data.err) {
                 this.setState({
@@ -414,7 +414,8 @@ export class PlaceExpanded extends React.Component {
                 backgroundColor: 'white',
                 position: 'absolute',
                 zIndex: 20,
-                overflow: 'hidden'
+                overflow: 'hidden',
+                elevation: 12,
             },
             cover : {
                 width: '100%',
@@ -450,6 +451,7 @@ export class PlaceExpanded extends React.Component {
                 justifyContent: 'space-between',
                 alignItems: 'flex-end',
                 zIndex: 4,
+                elevation: 15,
             },
             titleBox : {
                 height: 120,
@@ -548,6 +550,7 @@ export class PlaceExpanded extends React.Component {
                 shadowColor: '#000',
                 marginLeft: 14,
                 borderRadius: 6,
+                elevation: 14,
             },
             photoBox : {
                 
@@ -609,6 +612,7 @@ export class PlaceExpanded extends React.Component {
                 width: this.props.screenDimensions.width - 26,
                 height: 120,
                 zIndex: 4,
+                elevation: 14
             },
             review : {
                 width: this.props.screenDimensions.width - 26,
@@ -671,7 +675,8 @@ export class PlaceExpanded extends React.Component {
                 borderRadius: 6,
                 width: this.props.screenDimensions.width - 26,
                 minHeight: 60,
-                padding: 10
+                padding: 10,
+                elevation: 14
                 
             },
             addReviewText : {
